@@ -27,7 +27,7 @@ describe('StatsClient class', () => {
 
     afterEach(() => redisClient.clear(() => {}));
 
-    it('should correctly record a new request', () => {
+    it('should correctly record a new request by default one increment', () => {
         statsClient.reportNewRequest(id, (err, res) => {
             assert.ifError(err);
             assert(Array.isArray(res));
@@ -44,6 +44,22 @@ describe('StatsClient class', () => {
 
             const expected = [[null, 2], [null, 1]];
             assert.deepEqual(res, expected);
+        });
+    });
+
+    it('should record new requests by defined amount increments', () => {
+        statsClient.reportNewRequest(id, 9);
+        statsClient.getStats(fakeLogger, id, (err, res) => {
+            assert.ifError(err);
+
+            assert.equal(res.requests, 9);
+        });
+
+        statsClient.reportNewRequest(id, null);
+        statsClient.getStats(fakeLogger, id, (err, res) => {
+            assert.ifError(err);
+
+            assert.equal(res.requests, 10);
         });
     });
 
